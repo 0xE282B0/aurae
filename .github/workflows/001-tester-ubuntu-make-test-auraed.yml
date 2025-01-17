@@ -40,7 +40,7 @@ env:
   CARGO_TERM_COLOR: always
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, type-cax21]
     steps:
       - uses: actions/checkout@v3
       - uses: bufbuild/buf-setup-action@v1
