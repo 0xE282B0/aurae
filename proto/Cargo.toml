@@ -24,6 +24,6 @@ license = "Apache-2.0"
 
 [dependencies]
 pbjson = "0.5.1"
-prost = "0.11.2"
+prost = "0.13.4"
 serde = { workspace = true }
 tonic = { workspace = true }
