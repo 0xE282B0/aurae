@@ -40,7 +40,7 @@ env:
   CARGO_TERM_COLOR: always
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, type-cax21]
     steps:
       - uses: actions/checkout@v3
       - uses: bufbuild/buf-setup-action@v1
@@ -87,6 +87,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y musl-tools
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
       - name: Cargo build, lint, test [make test]
         # This should remain the only command we execute as this matches the title of the file.
         # The goal is for this to be easy to find from the GitHub dashboard.
