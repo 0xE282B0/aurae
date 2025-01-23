@@ -110,6 +110,8 @@ impl From<VmSpec> for vmm::vm_config::VmConfig {
             platform: None,
             tpm: None,
             preserved_fds: None,
+            landlock_enable: false,
+            landlock_rules: None,
         }
     }
 }
