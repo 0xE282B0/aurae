@@ -263,7 +263,7 @@ dependencies = [
  "thiserror 1.0.69",
  "uuid",
  "vm-fdt",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-migration",
  "vmm-sys-util",
 ]
@@ -420,7 +420,7 @@ dependencies = [
  "futures",
  "futures-util",
  "hypervisor",
- "ipnetwork",
+ "ipnetwork 0.21.1",
  "iter_tools",
  "lazy_static",
  "libc",
@@ -434,7 +434,7 @@ dependencies = [
  "oci-spec",
  "once_cell",
  "pretty_assertions",
- "procfs 0.16.0",
+ "procfs",
  "proto",
  "rtnetlink",
  "seccompiler",
@@ -456,7 +456,7 @@ dependencies = [
  "uuid",
  "validation",
  "validation_macros",
- "vm-memory 0.14.1",
+ "vm-memory",
  "vmm",
  "vmm-sys-util",
  "walkdir",
@@ -789,7 +789,7 @@ dependencies = [
  "uuid",
  "virtio-bindings",
  "virtio-queue",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-virtio",
  "vmm-sys-util",
 ]
@@ -1059,9 +1059,9 @@ dependencies = [
 
 [[package]]
 name = "clone_dyn_types"
-version = "0.22.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "396d5af7ca5b1762b777271537d3b3d1465701e46b1c049233f53752f724c68d"
+checksum = "0c23e9c07455288757e5142aaeb0e999f9f34dd2d3c27c9b5f8e3f85f4cb1eda"
 
 [[package]]
 name = "codespan-reporting"
@@ -1784,7 +1784,7 @@ dependencies = [
  "http 1.2.0",
  "idna 0.3.0",
  "indexmap 2.7.1",
- "ipnetwork",
+ "ipnetwork 0.20.0",
  "k256",
  "lazy-regex",
  "libc",
@@ -2242,7 +2242,7 @@ dependencies = [
  "tpm",
  "vm-allocator",
  "vm-device",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-migration",
  "vmm-sys-util",
 ]
@@ -2514,7 +2514,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3384,7 +3384,7 @@ dependencies = [
  "serde_with",
  "thiserror 1.0.69",
  "vfio-ioctls",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vmm-sys-util",
 ]
 
@@ -3544,6 +3544,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "ipnetwork"
+version = "0.21.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf370abdafd54d13e54a620e8c3e1145f28e46cc9d704bc6d94414559df41763"
+
+[[package]]
 name = "is-macro"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3563,9 +3569,9 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "iter_tools"
-version = "0.20.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c78d89aa55b46d56926696af54fc5810bd4329d8cf2b5fdf2e224b8d96aabd69"
+checksum = "49a92afdf43693047a6079d379c88064970968bd6552a10f45c135a1c29e1094"
 dependencies = [
  "clone_dyn_types",
  "itertools 0.11.0",
@@ -3849,7 +3855,7 @@ dependencies = [
  "fixedbitset 0.5.7",
  "nix 0.28.0",
  "oci-spec",
- "procfs 0.17.0",
+ "procfs",
  "serde",
  "thiserror 2.0.11",
  "tracing",
@@ -3870,7 +3876,7 @@ dependencies = [
  "oci-spec",
  "once_cell",
  "prctl",
- "procfs 0.17.0",
+ "procfs",
  "regex",
  "rust-criu",
  "safe-path",
@@ -3916,7 +3922,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -3970,7 +3976,7 @@ version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "870c3814345f050991f99869417779f6062542bcf4ed81db7a1b926ad1306638"
 dependencies = [
- "vm-memory 0.16.1",
+ "vm-memory",
 ]
 
 [[package]]
@@ -4269,7 +4275,7 @@ dependencies = [
  "thiserror 1.0.69",
  "virtio-bindings",
  "virtio-queue",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-virtio",
  "vmm-sys-util",
 ]
@@ -4855,7 +4861,7 @@ dependencies = [
  "vfio_user",
  "vm-allocator",
  "vm-device",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-migration",
  "vmm-sys-util",
 ]
@@ -5183,21 +5189,6 @@ dependencies = [
 
 [[package]]
 name = "procfs"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "731e0d9356b0c25f16f33b5be79b1c57b562f141ebfcdb0ad8ac2c13a24293b4"
-dependencies = [
- "bitflags 2.8.0",
- "chrono",
- "flate2",
- "hex",
- "lazy_static",
- "procfs-core 0.16.0",
- "rustix",
-]
-
-[[package]]
-name = "procfs"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc5b72d8145275d844d4b5f6d4e1eef00c8cd889edb6035c21675d1bb1f45c9f"
@@ -5206,19 +5197,8 @@ dependencies = [
  "chrono",
  "flate2",
  "hex",
- "procfs-core 0.17.0",
+ "procfs-core",
  "rustix",
-]
-
-[[package]]
-name = "procfs-core"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d3554923a69f4ce04c4a754260c338f505ce22642d3830e049a399fc2059a29"
-dependencies = [
- "bitflags 2.8.0",
- "chrono",
- "hex",
 ]
 
 [[package]]
@@ -5812,7 +5792,7 @@ dependencies = [
  "errno 0.3.10",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6541,7 +6521,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -7034,7 +7014,7 @@ dependencies = [
  "getrandom",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -7904,7 +7884,7 @@ dependencies = [
  "log",
  "thiserror 1.0.69",
  "vfio-bindings",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vmm-sys-util",
 ]
 
@@ -7921,7 +7901,7 @@ dependencies = [
  "serde_json",
  "thiserror 1.0.69",
  "vfio-bindings",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vmm-sys-util",
 ]
 
@@ -7933,7 +7913,7 @@ dependencies = [
  "bitflags 2.8.0",
  "libc",
  "uuid",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vmm-sys-util",
 ]
 
@@ -7971,7 +7951,7 @@ dependencies = [
  "virtio-queue",
  "vm-allocator",
  "vm-device",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-migration",
  "vm-virtio",
  "vmm-sys-util",
@@ -7985,7 +7965,7 @@ checksum = "872e2f3fbd70a7e6f01689720cce3d5c2c5efe52b484dd07b674246ada0e9a8d"
 dependencies = [
  "log",
  "virtio-bindings",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vmm-sys-util",
 ]
 
@@ -7996,7 +7976,7 @@ source = "git+https://github.com/cloud-hypervisor/cloud-hypervisor?tag=v43.0#49a
 dependencies = [
  "arch",
  "libc",
- "vm-memory 0.16.1",
+ "vm-memory",
 ]
 
 [[package]]
@@ -8009,7 +7989,7 @@ dependencies = [
  "serde",
  "thiserror 1.0.69",
  "vfio-ioctls",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vmm-sys-util",
 ]
 
@@ -8017,17 +7997,6 @@ dependencies = [
 name = "vm-fdt"
 version = "0.3.0"
 source = "git+https://github.com/rust-vmm/vm-fdt?branch=main#ef5bd734f5f66fb07722d766981adbc915f0d941"
-
-[[package]]
-name = "vm-memory"
-version = "0.14.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c3aba5064cc5f6f7740cddc8dae34d2d9a311cac69b60d942af7f3ab8fc49f4"
-dependencies = [
- "libc",
- "thiserror 1.0.69",
- "winapi",
-]
 
 [[package]]
 name = "vm-memory"
@@ -8050,7 +8019,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 1.0.69",
- "vm-memory 0.16.1",
+ "vm-memory",
 ]
 
 [[package]]
@@ -8060,7 +8029,7 @@ source = "git+https://github.com/cloud-hypervisor/cloud-hypervisor?tag=v43.0#49a
 dependencies = [
  "log",
  "virtio-queue",
- "vm-memory 0.16.1",
+ "vm-memory",
 ]
 
 [[package]]
@@ -8105,7 +8074,7 @@ dependencies = [
  "virtio-queue",
  "vm-allocator",
  "vm-device",
- "vm-memory 0.16.1",
+ "vm-memory",
  "vm-migration",
  "vm-virtio",
  "vmm-sys-util",
@@ -8410,7 +8379,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
