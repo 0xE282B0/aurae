@@ -35,10 +35,11 @@
 #![warn(clippy::unwrap_used)]
 
 use auraescript::runtime;
-use deno_core::resolve_path;
+use deno_core::{error::CoreError, resolve_path};
 use std::env::current_dir;
 
-fn main() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<(), CoreError> {
+    //TODO:(Sven) map to anyhow
     let args: Vec<String> = std::env::args().collect();
 
     // only supports a single script for now
@@ -47,7 +48,15 @@ fn main() -> anyhow::Result<()> {
         std::process::exit(1);
     }
 
-    let main_module = resolve_path(&args[1].clone(), current_dir()?.as_path())?;
+    let main_module = resolve_path(
+        args[1].clone(),
+        current_dir()
+            .map_err(|_| {
+                ::deno_error::JsErrorBox::generic("Aurae current_dir")
+            })?
+            .as_path(),
+    )
+    .map_err(|_| ::deno_error::JsErrorBox::generic("Aurae AsPath"))?;
     let rt = runtime(main_module.clone());
     tokio::runtime::Builder::new_current_thread()
         .enable_all()

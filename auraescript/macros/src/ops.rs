@@ -102,15 +102,19 @@ pub(crate) fn ops_generator(input: TokenStream) -> TokenStream {
                             #[serde] req: ::proto::#module::#input_type,
                         ) -> std::result::Result<
                             ::proto::#module::#output_type,
-                            ::anyhow::Error
+                            ::deno_core::error::OpError
                         > {
                             let client = match client_rid {
-                                None => ::deno_core::RcRef::new(::client::Client::default().await?),
+                                None => ::deno_core::RcRef::new(::client::Client::default().await
+                                    .map_err(|_| ::deno_error::JsErrorBox::generic("Aurae Default Cliont Err"))
+                                    ?),
                                 Some(client_rid) => {
                                     let as_client = {
                                         let op_state = &op_state.borrow();
                                         let rt = &op_state.resource_table; // get `ResourceTable` from JsRuntime `OpState`
-                                        rt.get::<crate::builtin::auraescript_client::AuraeScriptClient>(client_rid)?.clone() // get `Client` from its rid
+                                        rt.get::<crate::builtin::auraescript_client::AuraeScriptClient>(client_rid) // get `Client` from its rid
+                                    .map_err(|_| ::deno_error::JsErrorBox::generic("Aurae ClentError")) // fix cliont error
+                                            ?.clone()
                                     };
                                     ::deno_core::RcRef::map(as_client, |v| &v.0)
                                 }
@@ -118,7 +122,7 @@ pub(crate) fn ops_generator(input: TokenStream) -> TokenStream {
                             let res = ::client::#module::#service_name_in_snake_case::#client_ident::#name(
                                 &(*client),
                                 req
-                            ).await?;
+                            ).await.map_err(|_| ::deno_error::JsErrorBox::generic("Aurae Clent TonicStatus"))?;
 
                             Ok(res.into_inner())
                         }
@@ -291,3 +295,4 @@ fn op_name(module: &Path, service_name: &str, method_name: &str) -> String {
         method_name.to_snake_case()
     )
 }
+

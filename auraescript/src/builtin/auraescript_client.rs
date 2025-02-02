@@ -16,7 +16,8 @@
 
 use anyhow::Result;
 use client::{AuraeConfig, Client};
-use deno_core::{self, op2, OpState, Resource, ResourceId};
+use deno_core::{self, error::OpError, op2, OpState, Resource, ResourceId};
+use deno_error::JsErrorBox;
 use std::{cell::RefCell, rc::Rc};
 
 // `AuraeConfig` `try_default`
@@ -24,8 +25,9 @@ use std::{cell::RefCell, rc::Rc};
 #[smi]
 pub(crate) fn as__aurae_config__try_default(
     op_state: &mut OpState,
-) -> Result<ResourceId> {
-    let config = AuraeConfig::try_default()?;
+) -> Result<ResourceId, OpError> {
+    let config = AuraeConfig::try_default()
+        .map_err(|err| JsErrorBox::new("AuraeConfi", err.to_string()))?;
     let rid = op_state.resource_table.add(AuraeScriptConfig(config));
     Ok(rid)
 }
@@ -51,8 +53,9 @@ pub(crate) fn as__aurae_config__from_options(
 pub(crate) fn as__aurae_config__parse_from_file(
     op_state: &mut OpState,
     #[string] path: String,
-) -> Result<ResourceId> {
-    let config = AuraeConfig::parse_from_toml_file(path)?;
+) -> Result<ResourceId, OpError> {
+    let config = AuraeConfig::parse_from_toml_file(path)
+        .map_err(|err| JsErrorBox::new("AuraeConfi", err.to_string()))?;
     let rid = op_state.resource_table.add(AuraeScriptConfig(config));
     Ok(rid)
 }
@@ -68,13 +71,15 @@ impl Resource for AuraeScriptConfig {} // Blank impl
 pub(crate) async fn as__client_new(
     op_state: Rc<RefCell<OpState>>,
     #[smi] config: ResourceId,
-) -> Result<ResourceId> {
+) -> Result<ResourceId, OpError> {
     let config = {
         let op_state = &op_state.borrow();
         let rt = &op_state.resource_table; // get `ResourceTable` from JsRuntime `OpState`
         rt.get::<AuraeScriptConfig>(config)?.0.clone() // get `Config` from its rid
     };
-    let client = Client::new(config).await?;
+    let client = Client::new(config)
+        .await
+        .map_err(|err| JsErrorBox::new("AuraeConfi", err.to_string()))?;
     let mut op_state = op_state.borrow_mut();
     let rid = op_state.resource_table.add(AuraeScriptClient(client));
     Ok(rid)
@@ -94,3 +99,4 @@ pub(crate) fn op_decls() -> Vec<::deno_core::OpDecl> {
 pub(crate) struct AuraeScriptClient(pub Client);
 
 impl Resource for AuraeScriptClient {} // Blank impl
+

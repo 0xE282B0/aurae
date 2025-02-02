@@ -78,15 +78,20 @@
 // TODO: need to figure out how to get tonic to allow this without allowing for whole crate
 #![allow(unused_qualifications)]
 
-use anyhow::{anyhow, bail, Error};
-use deno_ast::{EmitOptions, MediaType, ParseParams, SourceMapOption};
+use anyhow::anyhow;
+use deno_ast::{MediaType, ParseParams, SourceMapOption};
 use deno_core::{
-    self, error::AnyError, resolve_import, url::Url, JsRuntime,
-    ModuleLoadResponse, ModuleLoader, ModuleSource, ModuleSourceCode,
-    ModuleSpecifier, ModuleType, RequestedModuleType, ResolutionKind,
-    RuntimeOptions, SourceMapGetter,
+    self,
+    error::{CoreError, ModuleLoaderError},
+    resolve_import,
+    url::Url,
+    JsRuntime, ModuleLoadResponse, ModuleLoader, ModuleSource,
+    ModuleSourceCode, ModuleSpecifier, ModuleType, RequestedModuleType,
+    ResolutionKind, RuntimeOptions,
 };
-use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
+use std::{
+    borrow::Cow, cell::RefCell, collections::HashMap, future::Future, rc::Rc,
+};
 
 mod builtin;
 mod cells;
@@ -96,22 +101,22 @@ mod health;
 mod observe;
 mod vms;
 
-fn get_error_class_name(e: &AnyError) -> &'static str {
-    deno_runtime::errors::get_error_class_name(e).unwrap_or("Error")
-}
+// fn get_error_class_name(e: &AnyError) -> &'static str {
+//     deno_runtime::errors::get_error_class_name(e).unwrap_or("Error")
+// }
 
 deno_core::extension!(auraescript, ops_fn = stdlib);
 
-pub fn runtime(main_module: Url) -> impl Future<Output = Result<(), Error>> {
-    let source_map_store =
-        SourceMapStore(Rc::new(RefCell::new(HashMap::new())));
+pub fn runtime(
+    main_module: Url,
+) -> impl Future<Output = Result<(), CoreError>> {
+    let source_map_store = Rc::new(RefCell::new(HashMap::new()));
+
     let mut runtime = JsRuntime::new(RuntimeOptions {
         module_loader: Some(Rc::new(TypescriptModuleLoader {
             source_maps: source_map_store.clone(),
         })),
-        source_map_getter: Some(Rc::new(source_map_store)),
         extensions: vec![auraescript::init_ops()],
-        get_error_class_fn: Some(&get_error_class_name),
         ..Default::default()
     });
 
@@ -146,22 +151,24 @@ fn stdlib() -> Vec<deno_core::OpDecl> {
 }
 
 // From: https://github.com/denoland/deno/blob/main/core/examples/ts_module_loader.rs
-#[derive(Clone)]
-struct SourceMapStore(Rc<RefCell<HashMap<String, Vec<u8>>>>);
+// #[derive(Clone)]
+// struct SourceMapStore(Rc<RefCell<HashMap<String, Vec<u8>>>>);
 
-impl SourceMapGetter for SourceMapStore {
-    fn get_source_map(&self, specifier: &str) -> Option<Vec<u8>> {
-        self.0.borrow().get(specifier).cloned()
-    }
+// impl SourceMapGetter for SourceMapStore {
+//     fn get_source_map(&self, specifier: &str) -> Option<Vec<u8>> {
+//         self.0.borrow().get(specifier).cloned()
+//     }
+//
+//     fn get_source_line(
+//         &self,
+//         _file_name: &str,
+//         _line_number: usize,
+//     ) -> Option<String> {
+//         None
+//     }
+// }
 
-    fn get_source_line(
-        &self,
-        _file_name: &str,
-        _line_number: usize,
-    ) -> Option<String> {
-        None
-    }
-}
+type SourceMapStore = Rc<RefCell<HashMap<String, Vec<u8>>>>;
 
 struct TypescriptModuleLoader {
     source_maps: SourceMapStore,
@@ -173,7 +180,7 @@ impl ModuleLoader for TypescriptModuleLoader {
         specifier: &str,
         referrer: &str,
         _is_main: ResolutionKind,
-    ) -> Result<ModuleSpecifier, Error> {
+    ) -> Result<ModuleSpecifier, ModuleLoaderError> {
         Ok(resolve_import(specifier, referrer)?)
     }
 
@@ -184,10 +191,11 @@ impl ModuleLoader for TypescriptModuleLoader {
         _is_dyn_import: bool,
         _requested_module_type: RequestedModuleType,
     ) -> ModuleLoadResponse {
+        let source_maps = self.source_maps.clone();
         fn load(
             source_maps: SourceMapStore,
             module_specifier: &ModuleSpecifier,
-        ) -> Result<ModuleSource, Error> {
+        ) -> Result<ModuleSource, ModuleLoaderError> {
             let path = module_specifier
                 .to_file_path()
                 .map_err(|_| anyhow!("Only file:// URLs are supported."))?;
@@ -207,7 +215,13 @@ impl ModuleLoader for TypescriptModuleLoader {
                     | MediaType::Dcts
                     | MediaType::Tsx => (ModuleType::JavaScript, true),
                     MediaType::Json => (ModuleType::Json, false),
-                    _ => bail!("Unknown extension {:?}", path.extension()),
+                    _ => {
+                        return Err(anyhow!(
+                            "Unknown extension {:?}",
+                            path.extension()
+                        )
+                        .into())
+                    }
                 };
 
             let code = std::fs::read_to_string(&path)?;
@@ -219,25 +233,30 @@ impl ModuleLoader for TypescriptModuleLoader {
                     capture_tokens: false,
                     scope_analysis: false,
                     maybe_syntax: None,
-                })?;
-                let source = parsed
+                })
+                .map_err(anyhow::Error::new)?;
+                let res = parsed
                     .transpile(
-                        &Default::default(),
-                        &EmitOptions {
+                        &deno_ast::TranspileOptions {
+                            imports_not_used_as_values:
+                                deno_ast::ImportsNotUsedAsValues::Remove,
+                            use_decorators_proposal: true,
+                            ..Default::default()
+                        },
+                        &deno_ast::TranspileModuleOptions { module_kind: None },
+                        &deno_ast::EmitOptions {
                             source_map: SourceMapOption::Separate,
                             inline_sources: true,
                             ..Default::default()
                         },
-                    )?
-                    .into_source();
-
-                if let Some(map) = source.source_map {
-                    let _ = source_maps
-                        .0
-                        .borrow_mut()
-                        .insert(module_specifier.to_string(), map);
-                }
-                String::from_utf8(source.source)?
+                    )
+                    .map_err(anyhow::Error::new)?;
+                let res = res.into_source();
+                let source_map = res.source_map.expect("expected").into_bytes();
+                _ = source_maps
+                    .borrow_mut()
+                    .insert(module_specifier.to_string(), source_map);
+                res.text
             } else {
                 code
             };
@@ -248,9 +267,11 @@ impl ModuleLoader for TypescriptModuleLoader {
                 None,
             ))
         }
-        ModuleLoadResponse::Sync(load(
-            self.source_maps.clone(),
-            module_specifier,
-        ))
+
+        ModuleLoadResponse::Sync(load(source_maps, module_specifier))
+    }
+
+    fn get_source_map(&self, specifier: &str) -> Option<Cow<[u8]>> {
+        self.source_maps.borrow().get(specifier).map(|v| v.clone().into())
     }
 }
