@@ -48,10 +48,7 @@ nightly: ## Add nightly toolchain (needed for eBPF)
 
 .PHONY: bpf-linker
 bpf-linker: ## Install bpf-linker (needed for eBPF)
-	$(cargo) install --list | grep -qc 'bpf-linker' || \
-	if [ '$(uname_m)' = 'aarch64' ]; \
-	then $(cargo) install --git https://github.com/aya-rs/bpf-linker  --tag v0.13.1 --no-default-features --features system-llvm -- bpf-linker; \
-	else $(cargo) install bpf-linker; fi
+	$(cargo) install bpf-linker
 
 clean: ## Clean the target artifacts
 	cargo clean

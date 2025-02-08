@@ -160,6 +160,7 @@ fn map_get_posix_signals_stream_response(
 }
 
 #[tonic::async_trait]
+#[allow(deprecated)]
 impl observe_service_server::ObserveService for ObserveService {
     type GetAuraeDaemonLogStreamStream =
         ReceiverStream<Result<GetAuraeDaemonLogStreamResponse, Status>>;
