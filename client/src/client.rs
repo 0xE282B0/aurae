@@ -21,9 +21,9 @@
 use crate::config::{AuraeConfig, CertMaterial, ClientCertDetails};
 use crate::AuraeSocket;
 use thiserror::Error;
-use tokio::net::{TcpStream, UnixStream};
-use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity, Uri};
-use tower::service_fn;
+//use tokio::net::{TcpStream, UnixStream};
+use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity}; //, Uri};
+                                                                         //use tower::service_fn;
 
 const KNOWN_IGNORED_SOCKET_ADDR: &str = "hxxp://null";
 
@@ -85,7 +85,7 @@ impl Client {
     }
 
     async fn connect_chan(
-        socket: AuraeSocket,
+        _socket: AuraeSocket,
         tls_config: Option<ClientTlsConfig>,
     ) -> Result<Channel> {
         let endpoint = Channel::from_static(KNOWN_IGNORED_SOCKET_ADDR);
@@ -96,23 +96,23 @@ impl Client {
 
         // If the system socket looks like a SocketAddr, bind to it directly.  Otherwise,
         // connect as a UNIX socket (assume it's a file path).
-        let channel = match socket {
-            AuraeSocket::Path(path) => {
-                endpoint
-                    .connect_with_connector(service_fn(move |_: Uri| {
-                        UnixStream::connect(path.clone())
-                    }))
-                    .await
-            }
-            AuraeSocket::Addr(addr) => {
-                endpoint
-                    .connect_with_connector(service_fn(move |_: Uri| {
-                        TcpStream::connect(addr)
-                    }))
-                    .await
-            }
-        }?;
+        // let channel = match socket {
+        //     AuraeSocket::Path(path) => {
+        //         endpoint
+        //             .connect_with_connector(service_fn(move |_: Uri| {
+        //                 UnixStream::connect(path.clone())
+        //             }))
+        //             .await
+        //     }
+        //     AuraeSocket::Addr(addr) => {
+        //         endpoint
+        //             .connect_with_connector(service_fn(move |_: Uri| {
+        //                 TcpStream::connect(addr)
+        //             }))
+        //             .await
+        //     }
+        // }?;
 
-        Ok(channel)
+        Ok(endpoint.connect().await?)
     }
 }
