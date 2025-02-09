@@ -62,6 +62,10 @@ export GIT_PAGER = cat
 .PHONY: all
 all: install ## alias for install
 
+.PHONY: cloud-init
+cloud-init: pki config os-deps install ebpf
+
+
 # ⚠️ DO NOT REMOVE ⚠️
 .PHONY: nova
 nova: auraed aer auraescript ## The official Kris Nóva alias for her workflow that only exists in her head.
