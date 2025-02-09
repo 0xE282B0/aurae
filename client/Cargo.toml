@@ -26,6 +26,7 @@ proto = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
+hyper-util = { version = "0.1.10"  }
 toml = "0.8.19"
 tonic = { workspace = true, features = ["tls"] }
 tower = { features = ["util"], version = "0.5.2" }

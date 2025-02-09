@@ -772,6 +772,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "client-macros",
+ "hyper-util",
  "proto",
  "serde",
  "thiserror 2.0.11",
