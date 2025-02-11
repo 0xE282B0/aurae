@@ -38,7 +38,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain none
 if ! hash buf; then
 	BUILD_PREFIX=$(mktemp -d)
 	PREFIX="/usr/local"
-	VERSION="1.32.0"
+	VERSION="1.50.0"
 	URL_BASE=https://github.com/bufbuild/buf/releases/download
 	DOWNLOAD_SLUG="v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz"
 	pushd "$BUILD_PREFIX" &&
