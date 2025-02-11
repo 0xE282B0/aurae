@@ -69,3 +69,7 @@ jobs:
         # Instead of adding more commands here, consider another make target or a new YAML file
         # named with a good name.
         run: make os-deps auraed-test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Auraed
+          path: target/debug/auraed
