@@ -45,3 +45,4 @@ pub mod observe {
 pub mod vms {
     include!("../gen/aurae.vms.v0.rs");
 }
+

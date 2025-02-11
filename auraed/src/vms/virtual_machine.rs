@@ -25,7 +25,7 @@ use std::{
 use vmm::config::DebugConsoleConfig;
 use vmm::{
     api::ApiAction,
-    config::{
+    vm_config::{
         default_console, default_serial, CpuFeatures, CpusConfig,
         HotplugMethod, MemoryConfig, PayloadConfig, RngConfig, VhostMode,
         DEFAULT_DISK_NUM_QUEUES, DEFAULT_DISK_QUEUE_SIZE,
@@ -115,6 +115,8 @@ impl From<VmSpec> for vmm::vm_config::VmConfig {
             platform: None,
             tpm: None,
             preserved_fds: None,
+            landlock_enable: false,
+            landlock_rules: None,
         }
     }
 }
@@ -216,7 +218,7 @@ impl VirtualMachine {
                 .send(
                     manager.events.try_clone()?,
                     sender.clone(),
-                    Arc::new(Mutex::new(spec.clone().into())),
+                    Box::new(spec.clone().into()),
                 )
                 .expect("Failed to send create request");
         } else {
@@ -317,10 +319,7 @@ impl VirtualMachine {
             let res = vmm::api::VmInfo
                 .send(manager.events.try_clone()?, sender.clone(), ())
                 .map_err(|e| anyhow!("Failed to send info request: {e}"))?;
-            let config = res
-                .config
-                .lock()
-                .map_err(|_| anyhow!("Failed to aquire lock for vm config"))?;
+            let config = *res.config;
             return Ok(config.clone());
         }
         Err(anyhow!("Virtual machine manager not initialized"))
@@ -334,7 +333,7 @@ impl VirtualMachine {
         let res = vmm::api::VmInfo
             .send(manager.events.try_clone().ok()?, manager.sender.clone()?, ())
             .ok()?;
-        let config = res.config.lock().ok()?;
+        let config = *res.config;
         let net = config.net.clone()?;
 
         let iface = net.first()?.tap.clone()?;
