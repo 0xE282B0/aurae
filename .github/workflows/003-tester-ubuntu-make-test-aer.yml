@@ -63,4 +63,8 @@ jobs:
         # The goal is for this to be easy to find from the GitHub dashboard.
         # Instead of adding more commands here, consider another make target or a new YAML file
         # named with a good name.
-        run: make os-deps aer-test
+        run: make os-deps aer-test aer-debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aer
+          path: target/debug/aer
