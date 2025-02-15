@@ -30,11 +30,12 @@
 # Variables and Settings
 branch       ?=  main
 message      ?=  Default commit message. Aurae Runtime environment.
-cargo         =  cargo
+cargo         =  ~/.cargo/bin/cargo
 oci           =  docker
 ociopts       =  DOCKER_BUILDKIT=1
 uid           =  $(shell id -u)
 uname_m       =  $(shell uname -m)
+buf_version   =  1.50.0
 cri_version   =  release-1.26
 clh_version   =  30.0
 vm_kernel     =  6.1.6
@@ -88,10 +89,10 @@ clean: clean-certs clean-gens clean-crates ## Clean the repo
 lint: auraed-lint not-auraed-lint ## Run all lints
 
 .PHONY: test
-test: auraed-build auraed-lint auraed-test not-auraed-build not-auraed-lint not-auraed-test ## Builds, lints, and tests (does not include ignored tests)
+test: auraed-build auraed-test not-auraed-build not-auraed-test ## Builds, lints, and tests (does not include ignored tests)
 
 .PHONY: test-all
-test-all: auraed-build auraed-lint auraed-test-all not-auraed-build not-auraed-lint not-auraed-test-all ## Run lints and tests (includes ignored tests)
+test-all: auraed-build auraed-test-all not-auraed-build not-auraed-test-all ## Run lints and tests (includes ignored tests)
 
 .PHONY: build
 build: auraed-build auraed-lint not-auraed-build not-auraed-lint ## Build and lint
@@ -172,10 +173,10 @@ GEN_RS += $(patsubst api/v0/%,$(GEN_TONIC_RS_PATTERN),$(PROTO_DIRS))
 
 GEN_TS = $(patsubst api/v0/%.proto,$(GEN_TS_PATTERN),$(PROTOS))
 
-BUF_VERSION = $(shell buf --version)
+BUF_CLI_VERSION = $(shell buf --version)
 
 $(GEN_TS_PATTERN) $(GEN_RS_PATTERN) $(GEN_SERDE_RS_PATTERN) $(GEN_TONIC_RS_PATTERN): $(PROTOS)
-	@if [ "${BUF_VERSION}" != "1.32.0" ]; then echo "Warning: buf 1.32.0 is not installed! Please install v1.32.0 of the 'buf' command line tool: https://docs.buf.build/installation"; exit 1; fi;
+	@if [ "${BUF_CLI_VERSION}" != "$(buf_version)" ]; then echo "Warning: buf $(buf_version) is not installed! Please install $(buf_version) of the 'buf' command line tool: https://docs.buf.build/installation"; exit 1; fi;
 	buf lint api
 	buf generate -v api
 
@@ -264,11 +265,11 @@ not-auraed-lint: $(GEN_RS) $(GEN_TS)
 	$(cargo) clippy --all-features --workspace --exclude auraed -- -D clippy::all -D warnings
 
 .PHONY: not-auraed-test
-not-auraed-test: $(GEN_RS) $(GEN_TS)
+not-auraed-test: $(GEN_RS) $(GEN_TS) not-auraed-lint
 	$(cargo) test --workspace --locked --exclude auraed
 
 .PHONY: not-auraed-test-all
-not-auraed-test-all: $(GEN_RS) $(GEN_TS)
+not-auraed-test-all: $(GEN_RS) $(GEN_TS) not-auraed-lint
 	$(cargo) test --workspace --locked --exclude auraed -- --include-ignored
 
 #------------------------------------------------------------------------------#
