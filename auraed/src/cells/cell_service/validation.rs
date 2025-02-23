@@ -22,13 +22,13 @@ use super::cells::{
 };
 use super::executables::ExecutableName;
 use crate::cells::cell_service::cells::CellName;
+use process_wrap::tokio::TokioCommandWrap;
 use proto::cells::{
     Cell, CellServiceAllocateRequest, CellServiceFreeRequest,
     CellServiceStartRequest, CellServiceStopRequest, CpuController,
     CpusetController, Executable, MemoryController,
 };
 use std::ffi::OsString;
-use tokio::process::Command;
 use validation::{ValidatedType, ValidationError};
 use validation_macros::ValidatedType;
 
@@ -305,14 +305,15 @@ impl From<ValidatedExecutable> for super::executables::ExecutableSpec {
     fn from(x: ValidatedExecutable) -> Self {
         let ValidatedExecutable { name, command, description } = x;
 
-        let mut c = Command::new("sh");
-        let _ = c.args([OsString::from("-c"), command]);
+        let wrapped_command = TokioCommandWrap::with_new("sh", |c| {
+            let _ = c.args([OsString::from("-c"), command]);
+        });
 
         // We are checking that command has an arg to assure ourselves that `command.arg`
         // mutates command, and is not making a clone to return
-        assert_eq!(c.as_std().get_args().len(), 2);
+        assert_eq!(wrapped_command.command().as_std().get_args().len(), 2);
 
-        Self { name, command: c, description }
+        Self { name, wrapped_command, description }
     }
 }
 
