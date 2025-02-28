@@ -33,6 +33,7 @@
 sudo apt-get update &&
 	sudo apt-get install -y musl-tools
 
+curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain none
 # install buf 1.32.0
 if ! hash buf; then
 	BUILD_PREFIX=$(mktemp -d)

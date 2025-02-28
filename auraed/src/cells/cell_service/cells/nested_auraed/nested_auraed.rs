@@ -202,8 +202,12 @@ impl NestedAuraed {
 
             if res == -1 {
                 let err = io::Error::last_os_error();
-                match err.kind() {
-                    ErrorKind::Interrupted => continue,
+                match err {
+                    e if e.kind() == ErrorKind::Interrupted => continue,
+                    e if e.raw_os_error() == Some(10) => {
+                        eprintln!("Ignoring ECHILD error: {:?}", e);
+                        break Ok(0);
+                    }
                     _ => break Err(err),
                 }
             }
@@ -222,3 +226,4 @@ impl NestedAuraed {
         Pid::from_raw(self.process.pid)
     }
 }
+

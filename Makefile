@@ -30,7 +30,7 @@
 # Variables and Settings
 branch       ?=  main
 message      ?=  Default commit message. Aurae Runtime environment.
-cargo         =  cargo
+cargo         =  ~/.cargo/bin/cargo
 oci           =  docker
 ociopts       =  DOCKER_BUILDKIT=1
 uid           =  $(shell id -u)

@@ -17,7 +17,7 @@ pub use error::{ExecutablesError, Result};
 pub use executable::Executable;
 pub use executable_name::ExecutableName;
 pub use executables::Executables;
-use tokio::process::Command;
+pub use process_wrap::tokio::TokioCommandWrap;
 
 mod error;
 mod executable;
@@ -28,5 +28,5 @@ mod executables;
 pub struct ExecutableSpec {
     pub name: ExecutableName,
     pub description: String,
-    pub command: Command,
+    pub wrapped_command: TokioCommandWrap,
 }
