@@ -89,7 +89,7 @@ test: build lint libs-test auraed-test auraescript-test aer-test ## Builds, lint
 test-all: build lint libs-test-all auraed-test-all auraescript-test-all aer-test-all ## Run lints and tests (includes ignored tests)
 
 .PHONY: build
-build: musl auraed-build auraescript-build aer-build lint ## Build and lint
+build: musl auraed-build aer-build ## Build and lint
 
 .PHONY: install
 install: musl lint test auraed-debug auraescript-debug aer-debug  ## Lint, test, and install (debug) 🎉
