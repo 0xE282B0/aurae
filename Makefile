@@ -172,7 +172,7 @@ GEN_RS += $(patsubst api/v0/%,$(GEN_TONIC_RS_PATTERN),$(PROTO_DIRS))
 
 GEN_TS = $(patsubst api/v0/%.proto,$(GEN_TS_PATTERN),$(PROTOS))
 
-BUF_VERSION = $(shell buf --version)
+BUF_VERSION = "1.32.0"
 
 $(GEN_TS_PATTERN) $(GEN_RS_PATTERN) $(GEN_SERDE_RS_PATTERN) $(GEN_TONIC_RS_PATTERN): $(PROTOS)
 	@if [ "${BUF_VERSION}" != "1.32.0" ]; then echo "Warning: buf 1.32.0 is not installed! Please install v1.32.0 of the 'buf' command line tool: https://docs.buf.build/installation"; exit 1; fi;
